@@ -1,8 +1,7 @@
 import path from "node:path";
+import { Effort } from "@scour/core";
 
 const here = import.meta.dirname;
-
-type Effort = "low" | "medium" | "high" | "xhigh" | "max";
 
 export const env = {
   port: Number(process.env.PORT ?? 3120),
@@ -15,8 +14,9 @@ export const env = {
   ebayClientId: process.env.EBAY_CLIENT_ID ?? "",
   ebayClientSecret: process.env.EBAY_CLIENT_SECRET ?? "",
   ebayMarketplace: process.env.EBAY_MARKETPLACE ?? "EBAY_US",
+  /** The model and effort until they're changed in Settings. */
   model: process.env.SCOUR_MODEL ?? "claude-opus-5-5",
-  effort: (process.env.SCOUR_EFFORT ?? "high") as Effort,
+  effort: Effort.parse(process.env.SCOUR_EFFORT ?? "high"),
   /** Time zone for the dates the agent reads, such as when an auction ends. */
   timeZone: process.env.TZ || "America/New_York",
   webDist: process.env.SCOUR_WEB_DIST ?? path.resolve(here, "../../web/dist"),

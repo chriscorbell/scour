@@ -35,8 +35,8 @@ Locally the agent uses your `claude` login. For UI work without eBay or Claude, 
 | `CLAUDE_CODE_OAUTH_TOKEN` | | A `claude setup-token` token, for the server. Not needed locally |
 | `SCOUR_EBAY` | `live` | `mock` uses built-in sample listings |
 | `SCOUR_AGENT` | `claude` | `mock` streams a scripted hunt |
-| `SCOUR_MODEL` | `claude-opus-5-5` | The agent's model |
-| `SCOUR_EFFORT` | `high` | The agent's reasoning effort |
+| `SCOUR_MODEL` | `claude-opus-5-5` | The agent's model, until it's changed in Settings |
+| `SCOUR_EFFORT` | `high` | The agent's reasoning effort (`low` to `max`), until it's changed in Settings |
 | `TZ` | `America/New_York` | Time zone for the times the agent reads, such as auction endings |
 | `PORT` | `3120` | HTTP port |
 | `SCOUR_DATA_DIR` | `apps/server/data` | Where the SQLite database lives |

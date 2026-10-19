@@ -15,6 +15,7 @@ Errors are `{ "error": "<sentence for a person>", "details"?: ... }` with a 4xx 
 | `GET /api/hunts/:id/stream` | | The reply being written, replayed from its beginning (no `start` event). 409 when nothing is being written. |
 | `POST /api/hunts/:id/stop` | | `{ ok: true }`. Stops the reply; it finishes with status `stopped`, keeping its findings. |
 | `PATCH /api/findings/:id` | `FindingPatch` | `Finding` |
+| `GET /api/models` | | `AgentModel[]`, the models Scour's Claude account offers. 502 when Claude can't be reached. |
 | `GET /api/settings` | | `Settings` |
 | `PUT /api/settings` | `Settings` | `Settings` |
 
