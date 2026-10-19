@@ -1,0 +1,135 @@
+@import "tailwindcss";
+
+/*
+  Scour design tokens. Dark only.
+  Elevation is a lightness step: ground, surface (cards, sheets), raised (controls, hover, placeholders).
+  Lines are 1px white at low alpha, used for the shell's frame and form fields, never around resting cards.
+  Shape: cards rounded-2xl (16px), photos inside them step down to 10px, controls and badges are full pills.
+  One data hue (sea-glass jade) for Top pick, live indicators and the price strip. It never fills a button:
+  the primary action is an inverted pill (white with near-black text).
+  Caution (sand) is for the agent's concerns: distinct from the text, but not an alarm.
+*/
+@theme {
+  --color-*: initial;
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-transparent: transparent;
+
+  --color-bg: #0e0f11;
+  --color-surface: #16171a;
+  --color-raised: #1f2124;
+  --color-hover: #282a2e;
+  --color-line: rgb(255 255 255 / 0.07);
+  --color-line-strong: rgb(255 255 255 / 0.12);
+
+  --color-ink: #f1f1f2;
+  --color-ink-2: #b3b4b9;
+  --color-ink-3: #8e9097;
+
+  --color-accent: #6fdcb1;
+  --color-accent-ink: #05180f;
+  --color-accent-soft: rgb(111 220 177 / 0.12);
+
+  --color-caution: #d9b26f;
+  --color-caution-soft: rgb(217 178 111 / 0.1);
+  --color-danger: #ef6b6b;
+  --color-danger-soft: rgb(239 107 107 / 0.12);
+
+  --font-sans: "Geist Variable", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: "Geist Mono Variable", ui-monospace, "SF Mono", monospace;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --animate-breathe: breathe 1.8s ease-in-out infinite;
+  @keyframes breathe {
+    0%,
+    100% {
+      opacity: 0.6;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  --animate-live: live 1.8s ease-out infinite;
+  @keyframes live {
+    0% {
+      transform: scale(1);
+      opacity: 0.55;
+    }
+    70%,
+    100% {
+      transform: scale(2.6);
+      opacity: 0;
+    }
+  }
+
+  --animate-caret: caret 1s steps(2, start) infinite;
+  @keyframes caret {
+    to {
+      visibility: hidden;
+    }
+  }
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+    background: var(--color-bg);
+    -webkit-tap-highlight-color: transparent;
+    text-size-adjust: 100%;
+  }
+  body {
+    background: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100dvh;
+  }
+  ::selection {
+    background: rgb(111 220 177 / 0.28);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+  input,
+  textarea,
+  select,
+  button {
+    font: inherit;
+    color: inherit;
+  }
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  select:not(:disabled) {
+    cursor: pointer;
+  }
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(255 255 255 / 0.12) transparent;
+  }
+}
+
+@utility tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+@utility pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+@utility pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

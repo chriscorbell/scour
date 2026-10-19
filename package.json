@@ -1,0 +1,13 @@
+{
+  "name": "scour",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@12.9.1",
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "dev": "pnpm --parallel --filter @scour/server --filter @scour/web dev",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test"
+  }
+}
