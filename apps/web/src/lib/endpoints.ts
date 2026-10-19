@@ -1,4 +1,4 @@
-import type { Finding, FindingPatch, Health, HuntSummary, HuntView, Settings } from "@scour/core";
+import type { AgentModel, Finding, FindingPatch, Health, HuntSummary, HuntView, Settings } from "@scour/core";
 import { api, apiFetch } from "./api.ts";
 
 const stream = { accept: "text/event-stream" };
@@ -10,6 +10,7 @@ export const endpoints = {
   deleteHunt: (id: number) => api<{ ok: true }>(`/hunts/${id}`, { method: "DELETE" }),
   stopHunt: (id: number) => api<{ ok: true }>(`/hunts/${id}/stop`, { method: "POST" }),
   patchFinding: (id: number, patch: FindingPatch) => api<Finding>(`/findings/${id}`, { method: "PATCH", body: patch }),
+  models: () => api<AgentModel[]>("/models"),
   settings: () => api<Settings>("/settings"),
   saveSettings: (settings: Settings) => api<Settings>("/settings", { method: "PUT", body: settings }),
 

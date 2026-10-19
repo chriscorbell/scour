@@ -2,6 +2,7 @@
 import type { Activity, Finding, FindingPatch, HuntSummary, HuntView, Listing, Message, MessageStatus, Settings, Verdict } from "@scour/core";
 import { isRunning } from "./agent/replies.ts";
 import { db, now } from "./db.ts";
+import { env } from "./env.ts";
 import { notFound } from "./http.ts";
 
 type Row = Record<string, unknown>;
@@ -164,7 +165,7 @@ export function patchFinding(id: number, patch: FindingPatch): Finding {
   return toFinding(row);
 }
 
-const DEFAULT_SETTINGS: Settings = { postalCode: null, notes: "" };
+const DEFAULT_SETTINGS: Settings = { postalCode: null, notes: "", model: env.model, effort: env.effort };
 
 export function getSettings(): Settings {
   const row = db.prepare("SELECT value FROM settings WHERE key = 'settings'").get() as { value: string } | undefined;

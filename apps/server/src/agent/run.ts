@@ -1,33 +1,18 @@
 // A reply: Chris's message is saved, then the agent hunts on its own, so a reply finishes and is saved
 // even if the page that asked goes away. Clients follow it as a stream of events (replies.ts).
-import os from "node:os";
-import path from "node:path";
-import fs from "node:fs";
 import { createSdkMcpServer, query } from "@anthropic-ai/claude-agent-sdk";
 import type { HuntStreamEvent, MessageStatus } from "@scour/core";
 import { env } from "../env.ts";
 import { HttpError } from "../http.ts";
-import { createHunt, finishMessage, huntRow, huntSummary, insertMessage, saveActivity, touchHunt } from "../store.ts";
+import { createHunt, finishMessage, getSettings, huntRow, huntSummary, insertMessage, saveActivity, touchHunt } from "../store.ts";
 import { mockConverse } from "./mock.ts";
+import { listModels } from "./models.ts";
 import { SYSTEM, turnPrompt } from "./prompt.ts";
 import { activeReply, addReply, isRunning, removeReply, Reply } from "./replies.ts";
+import { childEnv, workdir } from "./sdk.ts";
 import { huntTools } from "./tools.ts";
 
-const workdir = path.join(os.tmpdir(), "scour-agent");
-fs.mkdirSync(workdir, { recursive: true });
-
 const TIME_LIMIT_MS = 15 * 60_000;
-
-/**
- * The SDK replaces the child's environment when `env` is set, so pass ours through. An API key would
- * outrank the subscription token, and only the subscription is meant to be used here.
- */
-function childEnv(): Record<string, string | undefined> {
-  const out: Record<string, string | undefined> = { ...process.env, CLAUDE_AGENT_SDK_CLIENT_APP: `scour/${env.version}` };
-  delete out.ANTHROPIC_API_KEY;
-  delete out.ANTHROPIC_AUTH_TOKEN;
-  return out;
-}
 
 /** A provisional title from the request, until the agent names the hunt. */
 const titleFrom = (text: string) => {
@@ -99,6 +84,9 @@ async function typeOut(reply: Reply, text: string) {
 async function converse(reply: Reply) {
   const tools = huntTools(reply);
   const server = createSdkMcpServer({ name: "scour", version: env.version, tools, alwaysLoad: true });
+  const { model, effort } = getSettings();
+  const info = (await listModels().catch(() => [])).find((m) => m.id === model);
+  const level = info && !info.efforts.includes(effort) ? undefined : effort;
   // Text the agent writes between tool calls is a progress note, not the reply, but that's only known when
   // its message ends. So each message's text is held until then: a note becomes the status line, and the
   // text of the message that ends the turn streams out as the reply.
@@ -107,7 +95,7 @@ async function converse(reply: Reply) {
   for await (const message of query({
     prompt: turnPrompt(reply.huntId, reply.messageId),
     options: {
-      model: env.model,
+      model,
       systemPrompt: SYSTEM,
       tools: ["WebSearch"],
       mcpServers: { scour: server },
@@ -115,7 +103,7 @@ async function converse(reply: Reply) {
       settingSources: [],
       persistSession: false,
       maxTurns: 60,
-      effort: env.effort,
+      effort: level,
       includePartialMessages: true,
       cwd: workdir,
       env: childEnv(),
@@ -143,6 +131,8 @@ async function converse(reply: Reply) {
           if (typeof q === "string") reply.log("lookup", `Looked up "${q}"`);
         }
       }
+    } else if (message.type === "system" && message.subtype === "init") {
+      console.log(`[agent] hunt ${reply.huntId} on ${message.model}${level ? `, ${level} effort` : ""}`);
     } else if (message.type === "result" && message.subtype !== "success") {
       throw new Error(message.subtype === "error_max_turns" ? "The agent ran out of steps before finishing." : `The agent stopped: ${message.subtype}.`);
     }

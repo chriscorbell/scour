@@ -115,6 +115,21 @@ export type MessageRequest = z.infer<typeof MessageRequest>;
 export const FindingPatch = z.object({ starred: z.boolean().optional(), dismissed: z.boolean().optional() });
 export type FindingPatch = z.infer<typeof FindingPatch>;
 
+/** How hard the agent thinks before it acts. Higher is slower and more thorough. */
+export const Effort = z.enum(["low", "medium", "high", "xhigh", "max"]);
+export type Effort = z.infer<typeof Effort>;
+
+/** A Claude model the agent can run on, as offered to Scour's Claude account (GET /api/models). */
+export interface AgentModel {
+  /** Model ID, e.g. "claude-opus-5-5". */
+  id: string;
+  /** e.g. "Opus 5.5". */
+  name: string;
+  description: string;
+  /** Effort levels it accepts. Empty when it doesn't take one. */
+  efforts: Effort[];
+}
+
 export const Settings = z.object({
   /** Where items ship to, for shipping estimates. US ZIP code, or null. */
   postalCode: z
@@ -124,6 +139,10 @@ export const Settings = z.object({
     .nullable(),
   /** Anything the agent should always keep in mind, e.g. "I'd rather not buy from outside the US". */
   notes: z.string().trim().max(2000),
+  /** The agent's model ID, from GET /api/models. Defaults to SCOUR_MODEL. */
+  model: z.string().trim().min(1).max(100),
+  /** Defaults to SCOUR_EFFORT. Ignored when the model doesn't take an effort level. */
+  effort: Effort,
 });
 export type Settings = z.infer<typeof Settings>;
 

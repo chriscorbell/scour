@@ -6,6 +6,7 @@ import { streamSSE } from "hono/streaming";
 import { zValidator } from "@hono/zod-validator";
 import { ZodError, type ZodType } from "zod";
 import { FindingPatch, MessageRequest, Settings, type Health } from "@scour/core";
+import { listModels } from "./agent/models.ts";
 import { activeReply, followReply, isRunning } from "./agent/replies.ts";
 import { startReply, stopReply } from "./agent/run.ts";
 import { env } from "./env.ts";
@@ -74,6 +75,7 @@ export function createApp() {
     return c.json(finding);
   });
 
+  app.get("/api/models", async (c) => c.json(await listModels()));
   app.get("/api/settings", (c) => c.json(getSettings()));
   app.put("/api/settings", json(Settings), (c) => c.json(putSettings(c.req.valid("json"))));
 

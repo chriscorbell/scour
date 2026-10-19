@@ -33,6 +33,10 @@ export function useLive(id: number): LiveState {
   return useSyncExternalStore(live.subscribe, () => live.get(id));
 }
 
+export function useModels() {
+  return useQuery({ queryKey: keys.models, queryFn: endpoints.models, staleTime: 60 * 60_000, retry: 1 });
+}
+
 export function useSettings() {
   return useQuery({ queryKey: keys.settings, queryFn: endpoints.settings, staleTime: 60_000 });
 }
